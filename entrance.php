@@ -86,7 +86,7 @@ $unit = $MainView->loadUnitValue();
 
         <div class="card custom-card">
   <div class="card-body custom-card-body">
-    <h5 class="card-title">Current Fees</h5>
+    <h5 class="card-title">Current Fees <small style="font-size:11px">(<?=number_format($unit)." Rwf"?>/Mounth)</small> </h5>
     <div class="input-group mb-3 custom-input-group">
       <input type="text" class="form-control" value="<?=$unit?>" disabled id="exampleInput" oninput="handleInputChange(this)">
       <div class="input-group-append">
@@ -107,8 +107,8 @@ $unit = $MainView->loadUnitValue();
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">Note !</h5>
-              <p>The entrance fees that have been set are designed to have a widespread impact on all forthcoming entrances, as well as any subsequent payments or subscriptions that will be recorded in the system.
-                <br> This overarching decision ensures uniformity and consistency in the application of entrance fees, creating a standardized approach for all new entries and financial transactions within the system.</p>
+              <p>The subscription counts are calculated on a monthly basis, allowing flexibility for subscribers to choose any number of months. The pricing is proportionally affected based on the selected duration of subscription.
+                <br><br>Your entrance access remains valid until the conclusion of your subscription period.</p>
             </div>
           </div>
 
