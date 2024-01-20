@@ -241,7 +241,7 @@ public function allCustomerDetails($customerId)
         $response['customer'] = $custm[0];
 
         // Fetch subscription details
-        $sel_balance = $con->prepare("SELECT * FROM subscriptions WHERE SubscriptionClient = :customer2");
+        $sel_balance = $con->prepare("SELECT * FROM customer_subscriptions WHERE customer_id = :customer2");
         $sel_balance->bindParam(':customer2', $customerId);
         $sel_balance->execute();
         $blncData = $sel_balance->fetchAll();

@@ -116,25 +116,21 @@ require("main/view.php");
 
     <label class="col-sm-4 col-form-label"><b><u>Subscription:</u></b></label>
 
-    <div class="row mb-4">
-        <label class="col-sm-4 col-form-label">Balance:</label>
-        <div class="col-sm-8">
-            <div class="form-check form-switch" id="initialBalance"></div>
-            <div class="form-check form-switch" id="consumedBalance"></div>
-            <div class="form-check form-switch" id="remainingBalance" style="font-weight: bolder"></div>
-        </div>
-    </div>
-
     <div class="row mb-4" id="daysSection">
         <label class="col-sm-4 col-form-label">Period:</label>
         <div class="col-sm-8">
-        <div class="form-check form-switch" id="initialMonths"></div>
+            <div class="form-check form-switch" id="initialMonths"></div>
             <div class="form-check form-switch" id="consumedMonths"></div>
             <div class="form-check form-switch" id="remainingMonths" style="font-weight: bolder"></div>
 
+            <div class="form-check form-switch" id="startingDate"></div>
+            <div class="form-check form-switch" id="endingDate"></div><br><br>
             <div class="form-check form-switch" id="initialDays"></div>
             <div class="form-check form-switch" id="consumedDays"></div>
-            <div class="form-check form-switch" id="remainingDays" style="font-weight: bolder"></div>
+            <div class="form-check form-switch" id="remainingDays" style="font-weight: bolder">
+            
+        </div>
+
 
         </div>
     </div>
@@ -238,6 +234,7 @@ function selectCustomer(customerID) {
             
             var inputElement;
 var infoDetailsElement = document.getElementById("infoDetails");
+var recordEntranceButtonContainer = document.getElementById("recordEntranceButtonContainer");
 
 if (data.subscriptions === null) {
     console.log("No Subscriptions");
@@ -250,18 +247,16 @@ if (data.subscriptions === null) {
         inputElement.id = "amountpaid";
         infoDetailsElement.innerHTML = ''; // Clear existing content
         infoDetailsElement.appendChild(inputElement);
+        infoDetailsElement.style.display = "block";
+        recordEntranceButtonContainer.style.display = "block";
+
     }
 } else {
     console.log("There is a subscription");
     infoDetailsElement.style.display = "none";
+    recordEntranceButtonContainer.style.display = "none";
+
 }
-
-
-
-
-
-
-
             // Display customer names
             document.getElementById('customerName1').textContent = data.customer.CustomerFname;
             document.getElementById('customerName2').textContent = data.customer.CustomerLname;
@@ -284,27 +279,18 @@ if (data.subscriptions === null) {
             }
 
             // Display balance details if available
-            const balanceSection = document.getElementById('initialBalance').parentNode.parentNode;
+            const balanceSection = document.getElementById('initialMonths').parentNode.parentNode;
             balanceSection.style.display = data.subscriptions && data.subscriptions.length > 0 ? 'block' : 'none';
-
-            if (data.subscriptions && data.subscriptions.length > 0) {
-                document.getElementById('initialBalance').textContent = "Initial: "+formatCurrency(data.subscriptions[0].SubscriptionInitAmount);
-                document.getElementById('consumedBalance').textContent = "Consumed: "+formatCurrency(data.subscriptions[0].SubscriptionConsumedAmount);
-                document.getElementById('remainingBalance').textContent = "Remained: "+formatCurrency(data.subscriptions[0].SubscriptionRemainingAmount);
-                
-            }
 
             // Display days details
             const daysSection = document.getElementById('initialDays').parentNode.parentNode;
             daysSection.style.display = data.subscriptions ? 'block' : 'none';
 
-            document.getElementById('initialMonths').textContent = "Initial Months: "+(data.subscriptions ? data.subscriptions[0].InitialMonths : '');
-            document.getElementById('consumedMonths').textContent = "Consumed Months: "+(data.subscriptions ? data.subscriptions[0].ConsumedMonths : '');
-            document.getElementById('remainingMonths').textContent = "Remaining Months: "+(data.subscriptions ? data.subscriptions[0].RemainingMonths : '');
-
-            document.getElementById('initialDays').textContent = "Initial Days: "+(data.subscriptions ? data.subscriptions[0].SubscriptionInitDays : '');
-            document.getElementById('consumedDays').textContent = "Consumed Days: "+(data.subscriptions ? data.subscriptions[0].SubscriptionConsumedDays : '');
-            document.getElementById('remainingDays').textContent = "Remaining Days: "+(data.subscriptions ? data.subscriptions[0].SubscriptionRemainingDays : '');
+            document.getElementById('initialMonths').textContent = "Initial Months: "+(data.subscriptions ? data.subscriptions[0].all_months : '');
+            document.getElementById('consumedMonths').textContent = "Consumed Months: "+(data.subscriptions ? (data.subscriptions[0].all_months-data.subscriptions[0].remaining_months) : '');
+            document.getElementById('remainingMonths').textContent = "Remaining Months: "+(data.subscriptions ? data.subscriptions[0].remaining_months : '');
+            document.getElementById('startingDate').textContent = "Starting Date: "+(data.subscriptions ? data.subscriptions[0].starting_date : '');
+            document.getElementById('endingDate').textContent = "Ending Date: "+(data.subscriptions ? data.subscriptions[0].ending_date : '');
 
         })
         .catch(error => {
@@ -320,9 +306,6 @@ function recordEntry(customerID, type) {
     // Make an Ajax request to main/action.php with the recordEntrance data
     var requestBody;
 
-    if (type === 1) {
-        // Customize data for type 1
-    // Get the amountEntered value
     var amountEntered = document.getElementById("amountpaid").value;
 
     // Validate if amountEntered is set and not equal to 0 (for type 1 only)
@@ -341,16 +324,7 @@ function recordEntry(customerID, type) {
             amountEntered: amountEntered,
             // Add additional properties specific to type 1
         };
-    } else {
-        // Customize data for other types
-        requestBody = {
-            recordEntrance: 1,
-            client: customerID,
-            type: type,
-            amountEntered: null,
-            // Add additional properties specific to other types
-        };
-    }
+
 
     fetch('main/action.php', {
         method: 'POST',

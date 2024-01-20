@@ -200,7 +200,7 @@ class MainActions extends DBConnect
             if ($user) {
                 $MainView = new MainView();
                 $unit = $MainView->loadUnitValue();
-                if ($type == 1) {
+                // if ($type == 1) {
                     $type = 1;
                     $insertStmt = $con->prepare("INSERT INTO entrances (EntranceClient, EntranceType, EntranceAmount) VALUES (:client, :entr_type, :amount)");
                     $insertStmt->bindParam(':client', $user);
@@ -208,63 +208,63 @@ class MainActions extends DBConnect
                     $insertStmt->bindParam(':amount', $custom_amount);
                     $insertStmt->execute();
                     $response = array('success' => true, 'message' => 'Entrance registered successfully');
-                } else {
-                    $type = 2;
-                    $select_sub = $con->prepare("SELECT * FROM subscriptions WHERE SubscriptionClient = :client AND SubscriptionStatus=1");
-                    $select_sub->bindParam(':client', $user);
-                    $select_sub->execute(); // Added missing execute statement
-                    $subs = $select_sub->fetch(PDO::FETCH_ASSOC);
-                    $oneday_unit = $unit/30;
-                    if ($subs) {
-                        $subscription_balance = $subs['SubscriptionRemainingAmount'];
-                        if ($subscription_balance >= $unit) {
-                            $new_remain_amount = $subscription_balance - $unit;
-                            $new_consumed_amount = $subs['SubscriptionConsumedAmount'] + $oneday_unit;
-                            $new_remain_days = $subs['SubscriptionRemainingDays'] - 1;
-                            $new_consumed_days = $subs['SubscriptionConsumedDays'] + 1;
+                // } else {
+                //     $type = 2;
+                //     $select_sub = $con->prepare("SELECT * FROM subscriptions WHERE SubscriptionClient = :client AND SubscriptionStatus=1");
+                //     $select_sub->bindParam(':client', $user);
+                //     $select_sub->execute(); // Added missing execute statement
+                //     $subs = $select_sub->fetch(PDO::FETCH_ASSOC);
+                //     $oneday_unit = $unit/30;
+                //     if ($subs) {
+                //         $subscription_balance = $subs['SubscriptionRemainingAmount'];
+                //         if ($subscription_balance >= $unit) {
+                //             $new_remain_amount = $subscription_balance - $unit;
+                //             $new_consumed_amount = $subs['SubscriptionConsumedAmount'] + $oneday_unit;
+                //             $new_remain_days = $subs['SubscriptionRemainingDays'] - 1;
+                //             $new_consumed_days = $subs['SubscriptionConsumedDays'] + 1;
 
-                            $rec_entrance = $con->prepare("INSERT INTO entrances (EntranceClient, EntranceType, EntranceInitial, EntranceAmount, EntranceRemaining) VALUES (:client , :entr_type , :entr_init , :entr_amount , :entr_remain)");
-                            $rec_entrance->bindParam(':client', $user);
-                            $rec_entrance->bindParam(':entr_type', $type);
-                            $rec_entrance->bindParam(':entr_init', $subscription_balance);
-                            $rec_entrance->bindParam(':entr_amount', $oneday_unit);
-                            $rec_entrance->bindParam(':entr_remain', $new_remain_days);
-                            $ok_rec_entrance = $rec_entrance->execute();
-                            if ($ok_rec_entrance) {
-                                if($this->isDecreasingBy30($subs['SubscriptionConsumedDays'])){
-                                    $new_cons_mth = $subs['ConsumedMonths']+1;
-                                    $new_remained_mth = $subs['RemainingMonths']-1;
-                                    $update_subscription = $con->prepare("UPDATE subscriptions SET SubscriptionConsumedAmount = :consumed , SubscriptionRemainingAmount = :remain , SubscriptionConsumedDays = :consumed_days , SubscriptionRemainingDays = :remain_days , ConsumedMonths = :consumed_mt , RemainingMonths = :remained_mt WHERE SubscriptionClient = :client");
-                                    $update_subscription->bindParam(':consumed', $new_consumed_amount);
-                                    $update_subscription->bindParam(':remain', $new_remain_amount);
-                                    $update_subscription->bindParam(':consumed_days', $new_consumed_days);
-                                    $update_subscription->bindParam(':remain_days', $new_remain_days);
-                                    $update_subscription->bindParam(':client', $user);
-                                    $update_subscription->bindParam(':consumed_mt', $new_cons_mth);
-                                    $update_subscription->bindParam(':remained_mt', $new_remained_mth);
-                                }else{
-                                    $update_subscription = $con->prepare("UPDATE subscriptions SET SubscriptionConsumedAmount = :consumed , SubscriptionRemainingAmount = :remain , SubscriptionConsumedDays = :consumed_days , SubscriptionRemainingDays = :remain_days , ConsumedMonths = :consumed_mt , RemainingMonths = :remained_mt WHERE SubscriptionClient = :client");
-                                    $update_subscription->bindParam(':consumed', $new_consumed_amount);
-                                    $update_subscription->bindParam(':remain', $new_remain_amount);
-                                    $update_subscription->bindParam(':consumed_days', $new_consumed_days);
-                                    $update_subscription->bindParam(':remain_days', $new_remain_days);
-                                    $update_subscription->bindParam(':client', $user);
-                                    $update_subscription->bindParam(':consumed_mt', $subs['SubscriptionConsumedDays']);
-                                    $update_subscription->bindParam(':remained_mt', $subs['RemainingMonths']);
-                                }
+                //             $rec_entrance = $con->prepare("INSERT INTO entrances (EntranceClient, EntranceType, EntranceInitial, EntranceAmount, EntranceRemaining) VALUES (:client , :entr_type , :entr_init , :entr_amount , :entr_remain)");
+                //             $rec_entrance->bindParam(':client', $user);
+                //             $rec_entrance->bindParam(':entr_type', $type);
+                //             $rec_entrance->bindParam(':entr_init', $subscription_balance);
+                //             $rec_entrance->bindParam(':entr_amount', $oneday_unit);
+                //             $rec_entrance->bindParam(':entr_remain', $new_remain_days);
+                //             $ok_rec_entrance = $rec_entrance->execute();
+                //             if ($ok_rec_entrance) {
+                //                 if($this->isDecreasingBy30($subs['SubscriptionConsumedDays'])){
+                //                     $new_cons_mth = $subs['ConsumedMonths']+1;
+                //                     $new_remained_mth = $subs['RemainingMonths']-1;
+                //                     $update_subscription = $con->prepare("UPDATE subscriptions SET SubscriptionConsumedAmount = :consumed , SubscriptionRemainingAmount = :remain , SubscriptionConsumedDays = :consumed_days , SubscriptionRemainingDays = :remain_days , ConsumedMonths = :consumed_mt , RemainingMonths = :remained_mt WHERE SubscriptionClient = :client");
+                //                     $update_subscription->bindParam(':consumed', $new_consumed_amount);
+                //                     $update_subscription->bindParam(':remain', $new_remain_amount);
+                //                     $update_subscription->bindParam(':consumed_days', $new_consumed_days);
+                //                     $update_subscription->bindParam(':remain_days', $new_remain_days);
+                //                     $update_subscription->bindParam(':client', $user);
+                //                     $update_subscription->bindParam(':consumed_mt', $new_cons_mth);
+                //                     $update_subscription->bindParam(':remained_mt', $new_remained_mth);
+                //                 }else{
+                //                     $update_subscription = $con->prepare("UPDATE subscriptions SET SubscriptionConsumedAmount = :consumed , SubscriptionRemainingAmount = :remain , SubscriptionConsumedDays = :consumed_days , SubscriptionRemainingDays = :remain_days , ConsumedMonths = :consumed_mt , RemainingMonths = :remained_mt WHERE SubscriptionClient = :client");
+                //                     $update_subscription->bindParam(':consumed', $new_consumed_amount);
+                //                     $update_subscription->bindParam(':remain', $new_remain_amount);
+                //                     $update_subscription->bindParam(':consumed_days', $new_consumed_days);
+                //                     $update_subscription->bindParam(':remain_days', $new_remain_days);
+                //                     $update_subscription->bindParam(':client', $user);
+                //                     $update_subscription->bindParam(':consumed_mt', $subs['SubscriptionConsumedDays']);
+                //                     $update_subscription->bindParam(':remained_mt', $subs['RemainingMonths']);
+                //                 }
 
-                                $update_subscription->execute();
-                                $response = array('success' => true, 'message' => 'Recorded successfully');
-                            } else {
-                                $response = array('error' => true, 'message' => 'Recording Entrance Failed');
-                            }
-                        } else {
-                            $response = array('error' => true, 'message' => 'Not enough balance');
-                        }
-                    } else {
-                        $response = array('error' => true, 'message' => 'No Subscription found for this customer');
-                    }
-                }
+                //                 $update_subscription->execute();
+                //                 $response = array('success' => true, 'message' => 'Recorded successfully');
+                //             } else {
+                //                 $response = array('error' => true, 'message' => 'Recording Entrance Failed');
+                //             }
+                //         } else {
+                //             $response = array('error' => true, 'message' => 'Not enough balance');
+                //         }
+                //     } else {
+                //         $response = array('error' => true, 'message' => 'No Subscription found for this customer');
+                //     }
+                // }
             } else {
                 $response = array('error' => true, 'message' => 'Customer not found');
             }
@@ -479,7 +479,7 @@ if (isset($postData['AdminLogin']) && $postData['AdminLogin'] === "1") {
     $result = $MainActions->recordSubscription($postData['client'], $postData['amount']);
     echo $result;
 } elseif (isset($postData['recordEntrance'])) {
-    $result = $MainActions->recordEntrance($postData['client'], $postData['type'], $postData['type']);
+    $result = $MainActions->recordEntrance($postData['client'], $postData['type'], $postData['amountEntered']);
     echo $result; 
 } elseif (isset($postData['recordExpense'])) {
     $result = $MainActions->recordExpense($postData['expTitle'], $postData['expDetails'], $postData['expValue']);
