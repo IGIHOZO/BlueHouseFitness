@@ -191,7 +191,7 @@ $unit = $MainView->loadUnitValue();
 
         // Prepare data for submission
         const data = {
-            recordSubscription: 1,
+            save_subscription: 1,
             client: client,
             amount: amount
         };

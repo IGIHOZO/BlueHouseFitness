@@ -339,7 +339,7 @@ class MainActions extends DBConnect
     
         // Check if the amount is a whole number of units
         if ($amount % $unit !== 0) {
-            $response = array('error' => true, 'message' => 'Amount must be a multiple of the unit value');
+            $response = array('error' => true, 'message' => '<center>Amount entered does not correspond to the Monthly subscription cost.</center>');
             header('Content-Type: application/json');
             echo json_encode($response);
             return;
