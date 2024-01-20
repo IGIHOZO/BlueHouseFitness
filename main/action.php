@@ -375,13 +375,14 @@ class MainActions extends DBConnect
             $update_subs = $con->prepare("UPDATE customer_subscriptions 
                 SET ending_date = :new_end_dt, 
                     remaining_months = :new_remaining_months, 
-                    all_months = :new_all_months
+                    all_months = :new_all_months, updated_date= :now_date
                 WHERE customer_subscription_id = :sub_id");
     
             $update_subs->bindValue(':new_end_dt', $new_ending_date);
             $update_subs->bindValue(':new_remaining_months', $new_remaining_months);
             $update_subs->bindValue(':new_all_months', $new_all_months);
             $update_subs->bindValue(':sub_id', $fet_sel_sub['customer_subscription_id']);
+            $update_subs->bindValue(':now_date', $today);
             $ok_update_subs = $update_subs->execute();
     
             // Insert transaction with the calculated starting and ending dates
