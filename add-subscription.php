@@ -124,9 +124,9 @@ $unit = $MainView->loadUnitValue();
                         <th>Names</th>
                         <th>Phone</th>
                         <th>Recorded Date</th>
-                        <th>Init Amount</th>
+                        <!-- <th>Init Amount</th>
                         <th>Consumed Amount</th>
-                        <th>Remaining Amount</th>
+                        <th>Remaining Amount</th> -->
                         <th>Init Months</th>
                         <th>Consumed Months</th>
                         <th>Remaining Months</th>
@@ -246,17 +246,18 @@ $unit = $MainView->loadUnitValue();
                 var html = '';
                 var cnt = 1;
                 data.data.forEach(subscription => {
+                    
                     html += '<tr>';
                     html += '<td>' + cnt + '</td>';
                     html += '<td>' + subscription.CustomerFname + ' ' + subscription.CustomerLname + '</td>';
                     html += '<td>' + subscription.CustomerPhone + '</td>';
                     html += '<td>' + subscription.CustomerRecordedDate + '</td>';
-                    html += '<td>' + subscription.SubscriptionInitAmount + '</td>';
-                    html += '<td>' + subscription.SubscriptionConsumedAmount + '</td>';
-                    html += '<td>' + subscription.SubscriptionRemainingAmount + '</td>';
-                    html += '<td>' + subscription.SubscriptionInitDays + '</td>';
-                    html += '<td>' + subscription.SubscriptionConsumedDays + '</td>';
-                    html += '<td>' + subscription.SubscriptionRemainingDays + '</td>';
+                    // html += '<td>' + subscription.SubscriptionInitAmount + '</td>';
+                    // html += '<td>' + subscription.SubscriptionConsumedAmount + '</td>';
+                    // html += '<td>' + subscription.SubscriptionRemainingAmount + '</td>';
+                    html += '<td>' + subscription.all_months + '</td>';
+                    html += '<td>' + (subscription.all_months-subscription.remaining_months) + '</td>';
+                    html += '<td>' + subscription.remaining_months + '</td>';
                     // html += '<td>' + subscription.SubscriptionRecordedDate + '</td>';
                     html += '</tr>';
                     cnt++;

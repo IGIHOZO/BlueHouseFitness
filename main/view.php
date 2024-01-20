@@ -43,9 +43,9 @@ class MainView extends DBConnect
      $con = parent::connect();
  
      try {
-         $query = "SELECT * FROM subscriptions 
-                   JOIN customers ON subscriptions.SubscriptionClient = customers.CustomerID 
-                   WHERE customers.CustomerStatus = 1 AND subscriptions.SubscriptionStatus = 1";
+         $query = "SELECT * FROM customer_subscriptions 
+                   JOIN customers ON customer_subscriptions.customer_id  = customers.CustomerID 
+                   WHERE customers.CustomerStatus = 1 AND customer_subscriptions.status = 1";
  
          $sel = $con->prepare($query);
          $sel->execute();
