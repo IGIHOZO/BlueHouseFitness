@@ -164,7 +164,7 @@ class MainView extends DBConnect
      $con = parent::connect();
  
      try {
-         $query = "SELECT * FROM entrances,customers,subscriptions WHERE entrances.EntranceClient=customers.CustomerID AND subscriptions.SubscriptionClient=customers.CustomerID AND entrances.EntranceType=2 AND entrances.EntranceStatus=1";
+         $query = "SELECT * FROM customers,subscriptions_transactions WHERE subscriptions_transactions.client_id =customers.CustomerID ORDER BY subscriptions_transactions.transaction_id DESC";
  
          $sel = $con->prepare($query);
          $sel->execute();
@@ -174,7 +174,7 @@ class MainView extends DBConnect
          if ($entrance) {
              $response = array('message' => 'success', 'data' => $entrance);
          } else {
-             $response = array('found' => false, 'message' => 'No Entrance history found');
+             $response = array('found' => false, 'message' => 'No Sales history found');
          }
  
      } catch (PDOException $e) {

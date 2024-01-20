@@ -68,8 +68,9 @@ require("main/view.php");
                 <th>Names</th>
                 <th>Phone</th>
                 <th>Paid Amount</th>
-                <th>Non-Consumed</th>
-                <th>Date</th>
+                <th>Months</th>
+                <th>From</th>
+                <th>To</th>
             </tr>
         </thead>
         <tbody id="customerTableBody">
@@ -80,7 +81,7 @@ require("main/view.php");
                 <td colspan="3"></td>
                 <td id="totalPaidAmount"></td>
                 <td id="totalNonConsumed"></td>
-                <td colspan="1"></td>
+                <td colspan="1"></td><td colspan="1"></td>
             </tr>
         </tfoot>
     </table>
@@ -126,19 +127,23 @@ require("main/view.php");
 
                     data.data.forEach(customer => {
                         var ttype = customer.EntranceType == 1 ? "Pay as You Enter" : "Subscription";
-                        var entranceAmount = parseFloat(customer.EntranceAmount) || 0;
-                        var nonConsumed = parseFloat(customer.EntranceRemaining * entranceAmount) || 0;
+                        var entranceAmount = parseFloat(customer.amount_paid) || 0;
+                        var monthsPaid = parseFloat(customer.subscriptions_months) || 0;
 
                         totalPaidAmount += entranceAmount;
-                        totalNonConsumed += nonConsumed;
+                        totalNonConsumed += monthsPaid;
 
                         html += '<tr>';
                         html += '<td>' + cnt + '</td>';
                         html += '<td>' + (customer.CustomerFname || '-') + ' ' + (customer.CustomerLname || '-') + '</td>';
                         html += '<td>' + (customer.CustomerPhone || '-') + '</td>';
-                        html += '<td>' + entranceAmount.toLocaleString('en-US', { style: 'currency', currency: 'Rwf', minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</td>';
-                        html += '<td>' + nonConsumed.toLocaleString('en-US', { style: 'currency', currency: 'Rwf', minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</td>';
-                        html += '<td>' + (customer.EntranceTime.substring(0, 18) || '-') + '</td>';
+                        html += '<td>' + new Intl.NumberFormat('en-US', {style: 'currency',currency: 'RWF',minimumFractionDigits: 2,maximumFractionDigits: 2,}).format(customer.amount_paid) + '</td>';
+
+                        // html += '<td>' + nonConsumed.toLocaleString('en-US', { style: 'currency', currency: 'Rwf', minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</td>';
+                        // html += '<td>' + (customer.EntranceTime.substring(0, 18) || '-') + '</td>';
+                        html += '<td>' + (customer.subscriptions_months || '-') + '</td>';
+                        html += '<td>' + (customer.subscriptions_start || '-') + '</td>';
+                        html += '<td>' + (customer.subscriptions_end || '-') + '</td>';
                         html += '</tr>';
                         cnt++;
                     });
@@ -148,13 +153,13 @@ require("main/view.php");
 
                     // Display the total paid amount and total non-consumed
                     totalPaidAmountElement.textContent = 'Total Paid Amount: ' + totalPaidAmount.toLocaleString('en-US', { style: 'currency', currency: 'Rwf', minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                    totalNonConsumedElement.textContent = 'Total Non-Consumed: ' + totalNonConsumed.toLocaleString('en-US', { style: 'currency', currency: 'Rwf', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    totalNonConsumedElement.textContent = 'Total Months: ' + totalNonConsumed;
 
                     // Initialize DataTable with options to include the footer
                     $('#customerTable').DataTable({
                         "footerCallback": function (row, data, start, end, display) {
                             totalPaidAmountElement.textContent = 'Total Paid Amount: ' + totalPaidAmount.toLocaleString('en-US', { style: 'currency', currency: 'Rwf', minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                            totalNonConsumedElement.textContent = 'Total Non-Consumed: ' + totalNonConsumed.toLocaleString('en-US', { style: 'currency', currency: 'Rwf', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                            totalNonConsumedElement.textContent = 'Total Months: ' + totalNonConsumed;
                         }
                     });
                 })
