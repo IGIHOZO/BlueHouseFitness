@@ -1,5 +1,7 @@
 <?php 
 require("main/view.php");
+$MainView = new MainView();
+$unit = $MainView->loadUnitValue();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -71,7 +73,11 @@ require("main/view.php");
       <div class="col-lg-4">
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">New Subscription Details</h5>
+            <h5 class="card-title">New Subscription Details
+            <span class="card-title" style="font-size:smaller"> <br><?=number_format($unit)?> Rwf / Month</span>
+            </h5>
+
+
 
     <form id="subscriptionForm">
     <div class="row mb-5">
@@ -121,9 +127,9 @@ require("main/view.php");
                         <th>Init Amount</th>
                         <th>Consumed Amount</th>
                         <th>Remaining Amount</th>
-                        <th>Init Days</th>
-                        <th>Consumed Days</th>
-                        <th>Remaining Days</th>
+                        <th>Init Months</th>
+                        <th>Consumed Months</th>
+                        <th>Remaining Months</th>
                     </tr>
                 </thead>
                 <tbody id="customerTableBody"></tbody>

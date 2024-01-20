@@ -110,6 +110,7 @@ require("main/view.php");
             <div class="form-check form-switch" id="customerName1"></div>
             <div class="form-check form-switch" id="customerName2"></div>
             <div class="form-check form-switch" id="customerName3"></div>
+        <span id="infoDetails"></span>
         </div>
     </div>
 
@@ -125,11 +126,16 @@ require("main/view.php");
     </div>
 
     <div class="row mb-4" id="daysSection">
-        <label class="col-sm-4 col-form-label">Days:</label>
+        <label class="col-sm-4 col-form-label">Period:</label>
         <div class="col-sm-8">
+        <div class="form-check form-switch" id="initialMonths"></div>
+            <div class="form-check form-switch" id="consumedMonths"></div>
+            <div class="form-check form-switch" id="remainingMonths" style="font-weight: bolder"></div>
+
             <div class="form-check form-switch" id="initialDays"></div>
             <div class="form-check form-switch" id="consumedDays"></div>
             <div class="form-check form-switch" id="remainingDays" style="font-weight: bolder"></div>
+
         </div>
     </div>
 
@@ -229,6 +235,32 @@ function selectCustomer(customerID) {
         .then(data => {
             // Handle the response from main/view.php
             console.log('Customer Details:', data);
+            
+            var inputElement;
+var infoDetailsElement = document.getElementById("infoDetails");
+
+if (data.subscriptions === null) {
+    console.log("No Subscriptions");
+    // Recreate inputElement on the first condition
+    if (!inputElement) {
+        inputElement = document.createElement("input");
+        inputElement.type = "text";
+        inputElement.className = 'form-control';
+        inputElement.placeholder = "Enter amount...";
+        inputElement.id = "amountpaid";
+        infoDetailsElement.innerHTML = ''; // Clear existing content
+        infoDetailsElement.appendChild(inputElement);
+    }
+} else {
+    console.log("There is a subscription");
+    infoDetailsElement.style.display = "none";
+}
+
+
+
+
+
+
 
             // Display customer names
             document.getElementById('customerName1').textContent = data.customer.CustomerFname;
@@ -259,15 +291,21 @@ function selectCustomer(customerID) {
                 document.getElementById('initialBalance').textContent = "Initial: "+formatCurrency(data.subscriptions[0].SubscriptionInitAmount);
                 document.getElementById('consumedBalance').textContent = "Consumed: "+formatCurrency(data.subscriptions[0].SubscriptionConsumedAmount);
                 document.getElementById('remainingBalance').textContent = "Remained: "+formatCurrency(data.subscriptions[0].SubscriptionRemainingAmount);
+                
             }
 
             // Display days details
             const daysSection = document.getElementById('initialDays').parentNode.parentNode;
             daysSection.style.display = data.subscriptions ? 'block' : 'none';
 
-            document.getElementById('initialDays').textContent = "Initial: "+(data.subscriptions ? data.subscriptions[0].SubscriptionInitDays : '');
-            document.getElementById('consumedDays').textContent = "Consumed: "+(data.subscriptions ? data.subscriptions[0].SubscriptionConsumedDays : '');
-            document.getElementById('remainingDays').textContent = "Remaining: "+(data.subscriptions ? data.subscriptions[0].SubscriptionRemainingDays : '');
+            document.getElementById('initialMonths').textContent = "Initial Months: "+(data.subscriptions ? data.subscriptions[0].InitialMonths : '');
+            document.getElementById('consumedMonths').textContent = "Consumed Months: "+(data.subscriptions ? data.subscriptions[0].ConsumedMonths : '');
+            document.getElementById('remainingMonths').textContent = "Remaining Months: "+(data.subscriptions ? data.subscriptions[0].RemainingMonths : '');
+
+            document.getElementById('initialDays').textContent = "Initial Days: "+(data.subscriptions ? data.subscriptions[0].SubscriptionInitDays : '');
+            document.getElementById('consumedDays').textContent = "Consumed Days: "+(data.subscriptions ? data.subscriptions[0].SubscriptionConsumedDays : '');
+            document.getElementById('remainingDays').textContent = "Remaining Days: "+(data.subscriptions ? data.subscriptions[0].SubscriptionRemainingDays : '');
+
         })
         .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
@@ -280,47 +318,86 @@ function recordEntry(customerID, type) {
     console.log('Record Entrance clicked for Customer ID:', customerID, 'Type:', type);
 
     // Make an Ajax request to main/action.php with the recordEntrance data
+    var requestBody;
+
+    if (type === 1) {
+        // Customize data for type 1
+    // Get the amountEntered value
+    var amountEntered = document.getElementById("amountpaid").value;
+
+    // Validate if amountEntered is set and not equal to 0 (for type 1 only)
+    if (type === 1 && (!amountEntered || amountEntered === "0")) {
+        const messageContainer = document.getElementById('recordEntranceButtonContainer');
+        const messageElement = document.createElement('div');
+        messageElement.className = 'alert alert-danger';
+        messageElement.textContent = "Invalid entrance Amount..";
+        messageContainer.appendChild(messageElement);
+        return; // Exit the function if validation fails
+    }
+        requestBody = {
+            recordEntrance: 1,
+            client: customerID,
+            type: type,
+            amountEntered: amountEntered,
+            // Add additional properties specific to type 1
+        };
+    } else {
+        // Customize data for other types
+        requestBody = {
+            recordEntrance: 1,
+            client: customerID,
+            type: type,
+            amountEntered: null,
+            // Add additional properties specific to other types
+        };
+    }
+
     fetch('main/action.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-            recordEntrance: 1,
-            client: customerID,
-            type: type,
-        }),
+        body: JSON.stringify(requestBody),
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        // Handle the response from main/action.php
-        console.log('Record Entrance Response:', data);
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Handle the response from main/action.php
+            console.log('Record Entrance Response:', data);
 
-        // Display the success or error message to the user
-        const messageContainer = document.getElementById('recordEntranceButtonContainer');
+            // Display the success or error message to the user
+            const messageContainer = document.getElementById('recordEntranceButtonContainer');
 
-        // Create a new div for the message
-        const messageElement = document.createElement('div');
-        messageElement.className = `alert ${data.success ? 'alert-success' : 'alert-danger'}`;
-        messageElement.textContent = data.message;
+            // Create a new div for the message
+            const messageElement = document.createElement('div');
+            messageElement.className = `alert ${data.success ? 'alert-success' : 'alert-danger'}`;
+            messageElement.textContent = data.message;
 
-        // Append the message div after the button
-        messageContainer.appendChild(messageElement);
+            // Append the message div after the button
+            messageContainer.appendChild(messageElement);
 
-        // Optional: Remove the message after a certain delay
-        setTimeout(() => {
-            messageElement.remove();
-        }, 5000); // Adjust the delay (in milliseconds) as needed
-    })
-    .catch(error => {
-        console.error('There was a problem with the fetch operation:', error);
-    });
+            // Optional: Remove the message after a certain delay
+            setTimeout(() => {
+                messageElement.remove();
+            }, 5000); // Adjust the delay (in milliseconds) as needed
+
+            // Reload the page after 2 seconds if it was a success
+            if (data.success) {
+                setTimeout(() => {
+                    location.reload();
+                }, 2000); // Reload after 2 seconds
+            }
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
 }
+
+
 
 
 
