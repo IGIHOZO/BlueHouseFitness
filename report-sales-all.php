@@ -104,7 +104,7 @@ require("main/view.php");
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Make a GET request to main/view.php with the data parameter
-        fetch('main/view.php?all_entrance_history=1')
+        fetch('main/view.php?allPaymentsSalesReport=1')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -135,9 +135,10 @@ require("main/view.php");
                     html += '<td>' + cnt + '</td>';
                     html += '<td>' + (customer.CustomerFname || '-') + ' ' + (customer.CustomerLname || '-') + '</td>';
                     html += '<td>' + (customer.CustomerPhone || '-') + '</td>';
-                    html += '<td>' + entranceAmount.toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</td>';
-                    html += '<td>' + ttype + '</td>';
-                    html += '<td>' + (customer.EntranceTime || '-') + '</td>';
+                    // html += '<td>' + new Intl.NumberFormat('en-US', {style: 'currency',currency: 'RWF',minimumFractionDigits: 2,maximumFractionDigits: 2,}).format(customer.amount_paid) + '</td>';
+                    html += '<td>' + customer.amount_paid.toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</td>';
+                    html += '<td>' + customer.transaction_type + '</td>';
+                    html += '<td>' + (customer.date_saved || '-') + '</td>';
                     html += '</tr>';
                     cnt++;
                 });

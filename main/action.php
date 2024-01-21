@@ -453,7 +453,35 @@ class MainActions extends DBConnect
     }
     
     
+    public function updateSubscriptionMonths()
+    {
+        $con = parent::connect();
     
+        try {
+            $updateQuery = "UPDATE customer_subscriptions
+                            SET consumed_months = TIMESTAMPDIFF(MONTH, starting_date, NOW()),
+                                remaining_months = GREATEST(all_months - TIMESTAMPDIFF(MONTH, starting_date, NOW()), 0),
+                                updated_date = NOW()
+                            WHERE status = 'active'";
+    
+            $updateStmt = $con->prepare($updateQuery);
+            $updateStmt->execute();
+    
+            $rowCount = $updateStmt->rowCount();
+    
+            $response = array(
+                'message' => 'success',
+                'updated_rows' => $rowCount
+            );
+        } catch (PDOException $e) {
+            $response = array('error' => true, 'message' => 'Database error: ' . $e->getMessage());
+        }
+    
+        $con = null;
+        return json_encode($response);
+    }
+    
+
     
     
     
@@ -492,8 +520,21 @@ if (isset($postData['AdminLogin']) && $postData['AdminLogin'] === "1") {
 } elseif (isset($postData['save_subscription'])) {
     $result = $MainActions->save_subscription($postData['amount'], $postData['client']);
     echo $result; 
+} elseif (isset($postData['updateSubscriptionMonths'])) {
+    $result = $MainActions->updateSubscriptionMonths();
+    echo $result; 
 } else {
     echo json_encode(array('error' => true, 'message' => 'Invalid request.'));
 }
+
+
+
+
+
+
+
+
+
+$result = $MainActions->updateSubscriptionMonths();   //update customers monthly subscriptions (Sync)
 
 ?>

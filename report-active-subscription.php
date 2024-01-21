@@ -69,8 +69,8 @@ require("main/view.php");
             <th>Names</th>
             <th>Phone</th>
             <th>Initial Months</th>
-            <th>Initial Consumed Months</th>
-            <th>Consumed Remaining Months</th>
+            <th>Consumed Months</th>
+            <th>Remaining Months</th>
             <th>Last Subscription</th>
             <th>Customer Registered Date</th>
 

@@ -64,7 +64,7 @@ require("main/view.php");
             <th>#</th>
             <th>Name</th>
             <th>Phone</th>
-            <th>Status</th>
+            <!-- <th>Status</th> -->
             <th>Recorded Date</th>
             <!-- Add more header columns as needed based on your data -->
         </tr>
@@ -111,8 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     data.data.forEach(customer => {
                         html += '<tr>';
                         html += '<td>' + cnt + '</td>';
-                        html += '<td>' + customer.CustomerFname + '</td>';
-                        html += '<td>' + customer.CustomerLname + '</td>';
+                        html += '<td>' + customer.CustomerFname + ' ' + customer.CustomerLname + '</td>';
                         html += '<td>' + customer.CustomerPhone + '</td>';
                         html += '<td>' + customer.CustomerRecordedDate + '</td>';
                         html += '</tr>';

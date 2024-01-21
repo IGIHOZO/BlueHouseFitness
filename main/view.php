@@ -107,9 +107,9 @@ class MainView extends DBConnect
      $con = parent::connect();
  
      try {
-         $query = "SELECT * FROM subscriptions 
-                   JOIN customers ON subscriptions.SubscriptionClient = customers.CustomerID 
-                   WHERE customers.CustomerStatus = 1 AND subscriptions.SubscriptionStatus = 1 AND SubscriptionRemainingDays <1";
+         $query = "SELECT * FROM customer_subscriptions 
+                   JOIN customers ON customer_subscriptions.customer_id = customers.CustomerID 
+                   WHERE customers.CustomerStatus = 1 AND customer_subscriptions.remaining_months <1";
  
          $sel = $con->prepare($query);
          $sel->execute();
@@ -268,6 +268,202 @@ public function allCustomerDetails($customerId)
 }
 
 
+public function allPaymentsSalesReport()
+{
+    $con = parent::connect();
+
+    try {
+        $subscriptionQuery = "SELECT 'subscription' AS transaction_type, 
+                                      subscriptions_transactions.transaction_id, 
+                                      subscriptions_transactions.client_id, 
+                                      subscriptions_transactions.amount_paid AS amount_paid,
+                                      subscriptions_transactions.recorded_date AS date_saved, 
+                                      subscriptions_transactions.subscriptions_months, 
+                                      subscriptions_transactions.subscriptions_start, 
+                                      subscriptions_transactions.subscriptions_end, 
+                                      subscriptions_transactions.status AS subscription_status, 
+                                      subscriptions_transactions.recorded_date AS subscription_recorded_date,
+                                      customers.* 
+                              FROM subscriptions_transactions
+                              JOIN customers ON subscriptions_transactions.client_id = customers.CustomerID
+                              ORDER BY subscriptions_start DESC, recorded_date DESC, CustomerID DESC";
+
+        $entranceQuery = "SELECT 'entrance' AS transaction_type, 
+                                   entrances.EntranceID AS transaction_id, 
+                                   entrances.EntranceClient AS client_id, 
+                                   entrances.EntranceAmount AS amount_paid,
+                                   entrances.EntranceTime AS date_saved, 
+                                   NULL AS subscriptions_months, 
+                                   NULL AS subscriptions_start, 
+                                   NULL AS subscriptions_end, 
+                                   entrances.EntranceStatus AS entrance_status, 
+                                   entrances.EntranceTime AS entrance_recorded_date,
+                                   customers.* 
+                          FROM entrances
+                          JOIN customers ON entrances.EntranceClient = customers.CustomerID
+                          ORDER BY EntranceTime DESC, CustomerID DESC";
+
+        $data = [];
+
+        $subscriptionStmt = $con->prepare($subscriptionQuery);
+        $entranceStmt = $con->prepare($entranceQuery);
+
+        $subscriptionStmt->execute();
+        $entranceStmt->execute();
+
+        $subscriptionRow = $subscriptionStmt->fetch(PDO::FETCH_ASSOC);
+        $entranceRow = $entranceStmt->fetch(PDO::FETCH_ASSOC);
+
+        while ($subscriptionRow || $entranceRow) {
+            if ($subscriptionRow && (!$entranceRow || $subscriptionRow['subscriptions_start'] >= $entranceRow['entrance_recorded_date'])) {
+                $data[] = $subscriptionRow;
+                $subscriptionRow = $subscriptionStmt->fetch(PDO::FETCH_ASSOC);
+            } elseif ($entranceRow) {
+                $data[] = $entranceRow;
+                $entranceRow = $entranceStmt->fetch(PDO::FETCH_ASSOC);
+            }
+        }
+
+        if ($data) {
+            $response = array('message' => 'success', 'data' => $data);
+        } else {
+            $response = array('found' => false, 'message' => 'No Sales history found');
+        }
+
+    } catch (PDOException $e) {
+        $response = array('error' => true, 'message' => 'Database error: ' . $e->getMessage());
+    }
+
+    $con = null;
+    return json_encode($response);
+}
+
+
+private function calculateRemainingDays($startingDate, $endingDate, $allMonths)
+{
+    $now = new DateTime();
+    $startingDateTime = new DateTime($startingDate);
+    $endingDateTime = new DateTime($endingDate);
+
+    $remainingDays = max($endingDateTime < $now ? 0 : $endingDateTime->diff($now)->days, 0);
+
+    return $remainingDays;
+}
+
+public function checkRemainingDays()
+{
+    $con = parent::connect();
+
+    try {
+        $selectQuery = "SELECT customer_subscription_id, customer_id, starting_date, ending_date, all_months, remaining_months 
+                        FROM customer_subscriptions
+                        WHERE status = 'active' AND remaining_months > 0";
+
+        $selectStmt = $con->prepare($selectQuery);
+        $selectStmt->execute();
+
+        $subscriptions = $selectStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $response = array();
+
+        foreach ($subscriptions as $subscription) {
+            $remainingDays = $this->calculateRemainingDays($subscription['starting_date'], $subscription['ending_date'], $subscription['all_months']);
+            
+            // Corrected clientSelectQuery
+            $clientSelectQuery = "SELECT * FROM customers WHERE CustomerID = :customer_id";
+            $clientSelectStmt = $con->prepare($clientSelectQuery);
+            $clientSelectStmt->bindParam(':customer_id', $subscription['customer_id']);
+            $clientSelectStmt->execute();
+
+            $client = $clientSelectStmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($remainingDays <= 5) {
+                $response[] = array(
+                    'customer_subscription_id' => $subscription['customer_subscription_id'],
+                    'customer_id' => $subscription['customer_id'],
+                    'starting_date' => $subscription['starting_date'],
+                    'ending_date' => $subscription['ending_date'],
+                    'all_months' => $subscription['all_months'],
+                    'remaining_months' => $subscription['remaining_months'],
+                    'remaining_days' => $remainingDays,
+                    'f_name' => $client['CustomerFname'],
+                    'l_name' => $client['CustomerLname'],
+                    'phone' => $client['CustomerPhone'],
+                );
+
+                $this->sendSubscriptionNotification($client['CustomerPhone'], $remainingDays, $client['CustomerFname']);
+            }
+        }
+
+        if (!empty($response)) {
+            $message = 'success';
+        } else {
+            $message = 'No subscriptions found with less than 5 days remaining';
+        }
+
+        $response = array('message' => $message, 'data' => $response);
+    } catch (PDOException $e) {
+        $response = array('error' => true, 'message' => 'Database error: ' . $e->getMessage());
+    }
+
+    $con = null;
+    return json_encode($response);
+}
+public function sendSubscriptionNotification($recipient, $remainingDays, $fname)
+{
+    $url = "https://www.intouchsms.co.rw/api/sendsms/.json";
+
+    // Compose your message
+    $message = "Hello ".$fname."! Your exclusive membership with BLUEHOUSE FITNESS GYM is expiring soon. You have {$remainingDays} day".($remainingDays > 1 ? 's' : '')." remaining.
+
+Renew now to maintain access to our state-of-the-art facilities, personalized fitness plans, and a community committed to your wellness journey.
+
+Don't miss out on the ultimate fitness experience!";
+    // Set up the data
+    $data = array(
+        "sender" => 'BLUEHOUSE',
+        "recipients" => $recipient,
+        "message" => $message,
+    );
+
+    // Set up your InTouchSMS credentials
+    $username = "BLUEHOUSE";
+    $password = "MyFittness!#Gym07";
+
+    $data = http_build_query($data);
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_USERPWD, $username . ":" . $password);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+
+    // Execute cURL session and get the result
+    $result = curl_exec($ch);
+    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    // Close cURL session
+    curl_close($ch);
+
+    // Output the result and HTTP code
+    echo $result;
+    echo $httpcode;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }    
 
@@ -301,6 +497,12 @@ if (isset($_GET['all_customers'])) {
     echo $result;
 }elseif (isset($_GET['CustomerAllDetails'])) {
     $result = $MainView->allCustomerDetails($_GET['CustomerId']);
+    echo $result;
+}elseif (isset($_GET['allPaymentsSalesReport'])) {
+    $result = $MainView->allPaymentsSalesReport();
+    echo $result;
+}elseif (isset($_GET['checkRemainingDays'])) {
+    $result = $MainView->checkRemainingDays();
     echo $result;
 } else {
 
