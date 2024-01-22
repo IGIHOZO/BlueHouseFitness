@@ -8,7 +8,7 @@ require("main/view.php");
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Entrance Report - Blue Huose Fitness</title>
+  <title>Expense Report - Blue Huose Fitness</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -46,7 +46,7 @@ require("main/view.php");
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
-          <li class="breadcrumb-item active">Entrance Report</li>
+          <li class="breadcrumb-item active">Expense Report</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -57,27 +57,22 @@ require("main/view.php");
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Entrance Report</h5>
+              <h5 class="card-title">Expense Report</h5>
 
 <!-- Table with stripped rows -->
 <table id="customerTable" class="table table-striped table-dark" style="font-size:12px">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Time</th>
-            <th>Names</th>
-            <th>Phone</th>
-            <th>Fees</th>
-            <!-- <th>Initial Amount</th>
-            <th>Remaining Days</th> -->
-            <th>Entrance-Type</th>
-            <!-- Add more header columns as needed based on your data -->
-        </tr>
-    </thead>
-    <tbody id="customerTableBody">
-        <!-- Table rows will be dynamically added here -->
-    </tbody>
-</table>
+                  <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Recorded Date</th>
+                        <th>Title</th>
+                        <th>Details</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody id="expenseTableBody">
+                </tbody>
+              </table>
 <!-- End Table with stripped rows -->
 
 
@@ -96,7 +91,7 @@ require("main/view.php");
 
 document.addEventListener('DOMContentLoaded', function () {
             // Make a GET request to main/view.php with the data parameter
-            fetch('main/view.php?all_entrance_history=1')
+            fetch('main/view.php?displayExpenses=1')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -105,27 +100,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .then(data => {
                     // Get the reference to the table body
-                    var tableBody = document.getElementById('customerTableBody');
+                    var tableBody = document.getElementById('expenseTableBody');
 
                     // Clear existing rows
                     tableBody.innerHTML = '';
 
                     // Iterate through the data and construct HTML for each row
                     var html = '';
-var cnt = 1;
-data.data.forEach(customer => {
-    var ttype = customer.EntranceType == 1 ? "Paid" : "Subscription";
-
-    html += '<tr>';
-    html += '<td>' + cnt + '</td>';
-    html += '<td>' + (customer.EntranceTime || '-') + '</td>';
-    html += '<td>' + (customer.CustomerFname || '-') + ' ' + (customer.CustomerLname || '-') + '</td>';
-    html += '<td>' + (customer.CustomerPhone || '-') + '</td>';
-    html += '<td>' + (customer.EntranceAmount.toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '-') + '</td>';
-    html += '<td>' + ttype + '</td>';
-    html += '</tr>';
-    cnt++;
-});
+                    var cnt = 1;
+                    data.data.forEach(expense => {
+                        html += '<tr>';
+                        html += '<td>' + cnt + '</td>';
+                        html += '<td>' + expense.ExpenseDate + '</td>';
+                        html += '<td>' + expense.ExpenseName + '</td>';
+                        html += '<td>' + expense.ExpenseDetails + '</td>';
+                        html += '<td>' + expense.ExpenseValue + '</td>';
+                        html += '</tr>';
+                        cnt++;
+                    });
 
 
                     // Append the HTML to the table body

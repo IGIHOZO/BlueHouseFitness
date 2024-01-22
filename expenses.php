@@ -98,20 +98,20 @@ require("main/view.php");
         <div class="col-lg-7">
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">Customer Data</h5>
+            <h5 class="card-title">expense Data</h5>
 
             <table id="expenseTable" class="table" style="font-size: 11px;">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Recorded Date</th>
-                <th>Title</th>
-                <th>Details</th>
-                <th>Value</th>
-            </tr>
-        </thead>
-        <tbody id="expenseTableBody"></tbody>
-    </table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Recorded Date</th>
+                        <th>Title</th>
+                        <th>Details</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody id="expenseTableBody"></tbody>
+            </table>
 
         </div>
     </div>

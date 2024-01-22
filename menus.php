@@ -136,6 +136,11 @@
             </a>
           </li>
           <li>
+            <a href="expense-report.php">
+              <i style="font-size:medium" class="bi bi-alarm"></i><span>Expense Report</span>
+            </a>
+          </li>
+          <li>
             <a href="report-subscription.php">
               <i style="font-size:medium" class="bi bi-archive"></i><span>All Subscriptions</span>
             </a>
