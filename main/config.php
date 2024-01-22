@@ -1,9 +1,10 @@
 <?php
+session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-session_start();
+
 date_default_timezone_set('Africa/Kigali');
 if(!isset($_SESSION['user'])){
     header("Location: index.php");
@@ -13,7 +14,9 @@ if(!isset($_SESSION['user'])){
     $user = 'root';
     $pass = '';
     
-    // $pass = 'password';
+    // $dbname = 'bluehous_bluehouse';
+    // $user = 'bluehous_seveeen';
+    // $pass = 'Kigali123@';
 
 
     $con = new PDO("mysql:host=localhost;dbname=$dbname", $user, $pass);
@@ -24,7 +27,11 @@ class DbConnect
     private $dbName = 'bluehouse';
     private $user = 'root';
     private $pass = '';
-    // private $pass = 'password';
+
+    // private $host='localhost';
+    // private $dbName = 'bluehous_bluehouse';
+    // private $user = 'bluehous_seveeen';
+    // private $pass = 'Kigali123@';
 
     public $conn;
     
