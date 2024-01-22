@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 14, 2024 at 06:35 PM
+-- Generation Time: Jan 22, 2024 at 11:40 AM
 -- Server version: 10.4.14-MariaDB
 -- PHP Version: 7.4.11
 
@@ -41,7 +41,7 @@ CREATE TABLE `admin` (
 --
 
 INSERT INTO `admin` (`AdminID`, `AdminNames`, `AdminPhone`, `AdminPass`, `AdminStatus`, `AdminDateCreated`) VALUES
-(1, 'RUTIJANA Phocus', '0782013955', '202cb962ac59075b964b07152d234b70', 1, '2024-01-07 10:18:32');
+(1, 'RUTIJANA Phocus', '0789232145', '1bdf6f479e535fba87636d21c4bf901a', 1, '2024-01-07 10:18:32');
 
 -- --------------------------------------------------------
 
@@ -56,6 +56,23 @@ CREATE TABLE `customers` (
   `CustomerPhone` varchar(12) NOT NULL,
   `CustomerStatus` int(11) NOT NULL DEFAULT 1,
   `CustomerRecordedDate` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `customer_subscriptions`
+--
+
+CREATE TABLE `customer_subscriptions` (
+  `customer_subscription_id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `starting_date` date NOT NULL,
+  `ending_date` date NOT NULL,
+  `all_months` int(11) NOT NULL,
+  `remaining_months` int(11) NOT NULL,
+  `updated_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `status` varchar(10) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -119,7 +136,27 @@ CREATE TABLE `subscriptions` (
   `SubscriptionInitDays` int(11) NOT NULL,
   `SubscriptionConsumedDays` int(11) NOT NULL DEFAULT 0,
   `SubscriptionRemainingDays` int(11) NOT NULL,
-  `SubscriptionStatus` int(11) NOT NULL DEFAULT 1
+  `SubscriptionStatus` int(11) NOT NULL DEFAULT 1,
+  `InitialMonths` float NOT NULL,
+  `ConsumedMonths` float NOT NULL DEFAULT 0,
+  `RemainingMonths` float NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `subscriptions_transactions`
+--
+
+CREATE TABLE `subscriptions_transactions` (
+  `transaction_id` int(11) NOT NULL,
+  `client_id` int(11) NOT NULL,
+  `amount_paid` int(11) NOT NULL,
+  `subscriptions_months` int(11) NOT NULL,
+  `subscriptions_start` date NOT NULL,
+  `subscriptions_end` date NOT NULL,
+  `status` varchar(10) NOT NULL DEFAULT 'active',
+  `recorded_date` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -137,6 +174,12 @@ ALTER TABLE `admin`
 --
 ALTER TABLE `customers`
   ADD PRIMARY KEY (`CustomerID`);
+
+--
+-- Indexes for table `customer_subscriptions`
+--
+ALTER TABLE `customer_subscriptions`
+  ADD PRIMARY KEY (`customer_subscription_id`);
 
 --
 -- Indexes for table `entrances`
@@ -165,6 +208,12 @@ ALTER TABLE `subscriptions`
   ADD KEY `SubscriptionClient` (`SubscriptionClient`);
 
 --
+-- Indexes for table `subscriptions_transactions`
+--
+ALTER TABLE `subscriptions_transactions`
+  ADD PRIMARY KEY (`transaction_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -179,6 +228,12 @@ ALTER TABLE `admin`
 --
 ALTER TABLE `customers`
   MODIFY `CustomerID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `customer_subscriptions`
+--
+ALTER TABLE `customer_subscriptions`
+  MODIFY `customer_subscription_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `entrances`
@@ -197,6 +252,12 @@ ALTER TABLE `expenses`
 --
 ALTER TABLE `subscriptions`
   MODIFY `SubscriptionID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `subscriptions_transactions`
+--
+ALTER TABLE `subscriptions_transactions`
+  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables

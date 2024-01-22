@@ -350,7 +350,7 @@ class MainActions extends DBConnect
     
         $sel_sub = $con->prepare("SELECT * FROM customer_subscriptions WHERE customer_id=? AND status=?");
         $sel_sub->bindValue(1, $client);
-        $sel_sub->bindValue(2, 'active');
+        $sel_sub->bindValue(2, 1);
         $sel_sub->execute();
         $fet_sel_sub = $sel_sub->fetch(PDO::FETCH_ASSOC);
     
@@ -462,7 +462,7 @@ class MainActions extends DBConnect
                             SET consumed_months = TIMESTAMPDIFF(MONTH, starting_date, NOW()),
                                 remaining_months = GREATEST(all_months - TIMESTAMPDIFF(MONTH, starting_date, NOW()), 0),
                                 updated_date = NOW()
-                            WHERE status = 'active'";
+                            WHERE status = 1";
     
             $updateStmt = $con->prepare($updateQuery);
             $updateStmt->execute();

@@ -75,10 +75,10 @@ class MainView extends DBConnect
         //            WHERE customers.CustomerStatus = 1 AND customer_subscriptions.status = 1 AND SubscriptionRemainingDays >=1";
         // $query = "SELECT * FROM customer_subscriptions 
         //   JOIN customers ON customer_subscriptions.customer_id = customers.CustomerID 
-        //   WHERE customers.CustomerStatus = 1 AND customer_subscriptions.status = 'inactive' AND customer_subscriptions.ending_date < NOW()";
+        //   WHERE customers.CustomerStatus = 1 AND customer_subscriptions.status = 0 AND customer_subscriptions.ending_date < NOW()";
         $query = "SELECT * FROM customer_subscriptions 
         JOIN customers ON customer_subscriptions.customer_id = customers.CustomerID 
-        WHERE customers.CustomerStatus = 1 AND customer_subscriptions.status = 'active' AND DATE(customer_subscriptions.ending_date) >= CURDATE()";
+        WHERE customers.CustomerStatus = 1 AND customer_subscriptions.status = 1 AND DATE(customer_subscriptions.ending_date) >= CURDATE()";
 
 
 
@@ -357,7 +357,7 @@ public function checkRemainingDays()
     try {
         $selectQuery = "SELECT customer_subscription_id, customer_id, starting_date, ending_date, all_months, remaining_months 
                         FROM customer_subscriptions
-                        WHERE status = 'active' AND remaining_months > 0";
+                        WHERE status = 1 AND remaining_months > 0";
 
         $selectStmt = $con->prepare($selectQuery);
         $selectStmt->execute();

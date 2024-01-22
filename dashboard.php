@@ -32,13 +32,12 @@ require("main/view.php");
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
 
-  <!-- =======================================================
-  * Template Name: NiceAdmin
-  * Updated: Nov 17 2023 with Bootstrap v5.3.2
-  * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+  <style>
+  /* Add this style to make the button show a pointer cursor on hover */
+  #reloadButton {
+    cursor: pointer;
+  }
+</style>
 </head>
 
 <body>
@@ -83,16 +82,11 @@ require("main/view.php");
                 </div>
 
                 <div class="card-body">
-                  <h5 class="card-title">Sales <span>| Today</span></h5>
+                  <!-- <h5 class="card-title">Sales <span>| Today</span></h5> -->
 
                   <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-cart"></i>
-                    </div>
-                    <div class="ps-3">
-                      <h6>145</h6>
-                      <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span>
-
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center" id="reloadButton">
+                    <i class="bi bi-arrow-clockwise"></i>
                     </div>
                   </div>
                 </div>
@@ -118,17 +112,17 @@ require("main/view.php");
                 </div>
 
                 <div class="card-body">
-                  <h5 class="card-title">Revenue <span>| This Month</span></h5>
+                  <!-- <h5 class="card-title">Revenue <span>| This Month</span></h5> -->
 
                   <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                    <!-- <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                       <i class="bi bi-currency-dollar"></i>
                     </div>
                     <div class="ps-3">
                       <h6>Rwf 3,264</h6>
                       <span class="text-success small pt-1 fw-bold">8%</span> <span class="text-muted small pt-2 ps-1">increase</span>
 
-                    </div>
+                    </div> -->
                   </div>
                 </div>
 
@@ -136,11 +130,11 @@ require("main/view.php");
             </div><!-- End Revenue Card -->
 
             <!-- Customers Card -->
-            <div class="col-xxl-4 col-xl-12">
+            <!-- <div class="col-xxl-4 col-xl-12"> -->
 
-              <div class="card info-card customers-card">
+              <!-- <div class="card info-card customers-card"> -->
 
-                <div class="filter">
+                <!-- <div class="filter">
                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <li class="dropdown-header text-start">
@@ -151,9 +145,9 @@ require("main/view.php");
                     <li><a class="dropdown-item" href="#">This Month</a></li>
                     <li><a class="dropdown-item" href="#">This Year</a></li>
                   </ul>
-                </div>
+                </div> -->
 
-                <div class="card-body">
+                <!-- <div class="card-body">
                   <h5 class="card-title">Customers <span>| This Year</span></h5>
 
                   <div class="d-flex align-items-center">
@@ -167,16 +161,17 @@ require("main/view.php");
                     </div>
                   </div>
 
-                </div>
-              </div>
+                </div> -->
+              <!-- </div> -->
 
-            </div><!-- End Customers Card -->
+            <!-- </div> -->
+            <!-- End Customers Card -->
 
             <!-- Reports -->
             <div class="col-12">
               <div class="card">
 
-                <div class="filter">
+                <!-- <div class="filter">
                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <li class="dropdown-header text-start">
@@ -187,15 +182,15 @@ require("main/view.php");
                     <li><a class="dropdown-item" href="#">This Month</a></li>
                     <li><a class="dropdown-item" href="#">This Year</a></li>
                   </ul>
-                </div>
+                </div> -->
 
-                <div class="card-body">
-                  <h5 class="card-title">Reports <span>/Today</span></h5>
+                <!-- <div class="card-body">
+                  <h5 class="card-title">Reports <span>/Today</span></h5> -->
 
                   <!-- Line Chart -->
-                  <div id="reportsChart"></div>
+                  <!-- <div id="reportsChart"></div> -->
 
-                  <script>
+                  <!-- <script>
                     document.addEventListener("DOMContentLoaded", () => {
                       new ApexCharts(document.querySelector("#reportsChart"), {
                         series: [{
@@ -246,16 +241,17 @@ require("main/view.php");
                         }
                       }).render();
                     });
-                  </script>
+                  </script> -->
                   <!-- End Line Chart -->
 
-                </div>
+                <!-- </div> -->
 
               </div>
-            </div><!-- End Reports -->
+            </div>
+            <!-- End Reports -->
 
             <!-- Recent Sales -->
-            <div class="col-12">
+            <!-- <div class="col-12">
               <div class="card recent-sales overflow-auto">
 
                 <div class="filter">
@@ -326,7 +322,8 @@ require("main/view.php");
                 </div>
 
               </div>
-            </div><!-- End Recent Sales -->
+            </div> -->
+            <!-- End Recent Sales -->
 
           </div>
         </div><!-- End Left side columns -->
@@ -350,11 +347,11 @@ require("main/view.php");
             </div>
 
             <div class="card-body pb-0">
-              <h5 class="card-title">Cusomer payments <span>| This Year</span></h5>
+              <!-- <h5 class="card-title">Cusomer payments <span>| This Year</span></h5> -->
 
               <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
 
-              <script>
+              <!-- <script>
                 document.addEventListener("DOMContentLoaded", () => {
                   var budgetChart = echarts.init(document.querySelector("#budgetChart")).setOption({
                     legend: {
@@ -403,7 +400,7 @@ require("main/view.php");
                     }]
                   });
                 });
-              </script>
+              </script> -->
 
             </div>
           </div><!-- End Budget Report -->
@@ -423,7 +420,7 @@ require("main/view.php");
               </ul>
             </div>
 
-            <div class="card-body pb-0">
+            <!-- <div class="card-body pb-0">
               <h5 class="card-title">Customer Traffic <span>| Today</span></h5>
 
               <div id="trafficChart" style="min-height: 400px;" class="echart"></div>
@@ -483,7 +480,7 @@ require("main/view.php");
                 });
               </script>
 
-            </div>
+            </div> -->
           </div><!-- End Website Traffic -->
 
         </div><!-- End Right side columns -->
@@ -494,3 +491,33 @@ require("main/view.php");
   </main><!-- End #main -->
 
   <?php include("footer.php")?>
+
+  <script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Add click event listener to the button
+  document.getElementById('reloadButton').addEventListener('click', function() {
+    // Create a new XMLHttpRequest object
+    var xhr = new XMLHttpRequest();
+
+    // Set up the request
+    xhr.open('GET', 'main/view.php?checkRemainingDays=1', true);
+
+    // Define the callback function to handle the response
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState == 4) {
+        if (xhr.status == 200) {
+          // Handle the AJAX response here
+          console.log(xhr.responseText);
+          // You can update the UI or perform other actions based on the response
+        } else {
+          // Handle the error if the AJAX request fails
+          console.error('Error:', xhr.status, xhr.statusText);
+        }
+      }
+    };
+
+    // Send the request
+    xhr.send();
+  });
+});
+</script>
