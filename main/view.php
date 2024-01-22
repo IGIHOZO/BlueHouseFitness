@@ -453,6 +453,83 @@ Don't miss out on the ultimate fitness experience!";
 }
 
 
+public function recent_entrances()
+{
+    $con = parent::connect();
+    
+    try {
+        // Query to fetch sum of EntranceAmount per day for the last 7 days
+        $sel = $con->prepare("
+            SELECT 
+                DATE(EntranceTime) as date,
+                SUM(EntranceAmount) as total_amount
+            FROM entrances
+            WHERE EntranceTime >= NOW() - INTERVAL 30 DAY
+            GROUP BY date
+            ORDER BY date DESC
+        ");
+        $sel->execute();
+        $entrance = $sel->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($entrance) {
+            $response = array('message' => 'success', 'data' => $entrance);
+        } else {
+            $response = array('message' => 'success', 'data' => array());
+        }
+
+    } catch (PDOException $e) {
+        $response = array('error' => true, 'message' => 'Database error: ' . $e->getMessage());
+    }
+
+    $con = null;
+    return json_encode($response);
+}
+
+public function subscription_transactions()
+{
+    $con = parent::connect();
+
+    try {
+        // Query to fetch cumulative sum of amount_paid for each recorded_date in the last 30 days
+        $sel = $con->prepare("
+            SELECT 
+                recorded_date,
+                total_amount_paid,
+                (SELECT SUM(amount_paid) FROM subscriptions_transactions sub 
+                 WHERE sub.recorded_date = main.recorded_date) as cumulative_sum
+            FROM (
+                SELECT 
+                    SUM(amount_paid) as total_amount_paid,
+                    DATE_FORMAT(recorded_date, '%Y-%m-%d') as recorded_date
+                FROM subscriptions_transactions
+                WHERE recorded_date >= CURDATE() - INTERVAL 30 DAY
+                GROUP BY DATE_FORMAT(recorded_date, '%Y-%m-%d')
+                ORDER BY recorded_date asc
+            ) as main
+            ORDER BY recorded_date asc
+        ");
+        $sel->execute();
+        $transactions = $sel->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($transactions) {
+            $response = array('message' => 'success', 'data' => $transactions);
+        } else {
+            $response = array('message' => 'success', 'data' => array());
+        }
+
+    } catch (PDOException $e) {
+        $response = array('error' => true, 'message' => 'Database error: ' . $e->getMessage());
+    }
+
+    $con = null;
+    return json_encode($response);
+}
+
+
+
+
+
+
 
 
 
@@ -503,6 +580,12 @@ if (isset($_GET['all_customers'])) {
     echo $result;
 }elseif (isset($_GET['checkRemainingDays'])) {
     $result = $MainView->checkRemainingDays();
+    echo $result;
+}elseif (isset($_GET['recent_entrances'])) {
+    $result = $MainView->recent_entrances();
+    echo $result;
+}elseif (isset($_GET['subscription_transactions'])) {
+    $result = $MainView->subscription_transactions();
     echo $result;
 } else {
 

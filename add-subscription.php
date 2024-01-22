@@ -115,7 +115,7 @@ $unit = $MainView->loadUnitValue();
 <div class="col-lg-8">
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">Customer Data</h5>
+            <h5 class="card-title">Subscription Data</h5>
 
             <table id="customerTable" class="table" style="font-size: 11px;width:fit-content">
                 <thead>
@@ -124,9 +124,6 @@ $unit = $MainView->loadUnitValue();
                         <th>Names</th>
                         <th>Phone</th>
                         <th>Recorded Date</th>
-                        <!-- <th>Init Amount</th>
-                        <th>Consumed Amount</th>
-                        <th>Remaining Amount</th> -->
                         <th>Init Months</th>
                         <th>Consumed Months</th>
                         <th>Remaining Months</th>
