@@ -185,6 +185,48 @@ class MainView extends DBConnect
      return json_encode($response);
  }
 
+ public function all_SubSalleRep_history_date($date_from, $date_to)
+ {
+     $con = parent::connect();
+ 
+     try {
+         $query = "SELECT * FROM customers, subscriptions_transactions WHERE subscriptions_transactions.client_id = customers.CustomerID";
+ 
+         // Add date filtering to the query
+         if (!empty($date_from) && !empty($date_to)) {
+             $query .= " AND DATE(subscriptions_transactions.recorded_date) BETWEEN :date_from AND :date_to";
+         }
+ 
+         $query .= " ORDER BY subscriptions_transactions.transaction_id DESC";
+ 
+         $sel = $con->prepare($query);
+ 
+         // Bind date parameters if provided
+         if (!empty($date_from) && !empty($date_to)) {
+             $sel->bindParam(':date_from', $date_from);
+             $sel->bindParam(':date_to', $date_to);
+         }
+ 
+         $sel->execute();
+ 
+         $entrance = $sel->fetchAll(PDO::FETCH_ASSOC);
+ 
+         if ($entrance) {
+             $response = array('message' => 'success', 'data' => $entrance);
+         } else {
+             $response = array('found' => false, 'message' => 'No Sales history found');
+         }
+     } catch (PDOException $e) {
+         $response = array('error' => true, 'message' => 'Database error: ' . $e->getMessage());
+     }
+ 
+     $con = null;
+     return json_encode($response);
+ }
+ 
+ 
+ 
+
  public function all_nonSub_salles_report()
  {
      $con = parent::connect();
@@ -565,6 +607,9 @@ if (isset($_GET['all_customers'])) {
     echo $result;
 }elseif (isset($_GET['all_SubSalleRep_history'])) {
     $result = $MainView->all_SubSalleRep_history();
+    echo $result;
+}elseif (isset($_POST['all_SubSalleRep_history_date'])) {
+    $result = $MainView->all_SubSalleRep_history_date($_POST['from'],$_POST['to']);
     echo $result;
 }elseif (isset($_GET['all_nonSub_salles_report'])) {
     $result = $MainView->all_nonSub_salles_report();
