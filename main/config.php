@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 session_start();
 date_default_timezone_set('Africa/Kigali');
 if(!isset($_SESSION['user'])){
-    // header("Location: index.php");
+    header("Location: index.php");
 }
 //====================================================================================================== CONNECTION
     $dbname = 'bluehouse';
