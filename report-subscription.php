@@ -68,12 +68,9 @@ require("main/view.php");
             <!-- <th>Time</th> -->
             <th>Names</th>
             <th>Phone</th>
-            <th>Initial Amount</th>
-            <th>Initial Days</th>
-            <th>Consumed Amount</th>
-            <th>Consumed Days</th>
-            <th>Remaining Amount</th>
-            <th>Remaining Days</th>
+            <th>Initial Months</th>
+            <th>Consumed Months</th>
+            <th>Remaining Months</th>
             <th>Last Subscription</th>
             <th>Customer Registered Date</th>
 
@@ -126,17 +123,11 @@ data.data.forEach(customer => {
     html += '<td>' + cnt + '</td>';
     html += '<td>' + (customer.CustomerFname || '-') + ' ' + (customer.CustomerLname || '-') + '</td>';
     html += '<td>' + (customer.CustomerPhone || '-') + '</td>';
+    html += '<td>' + (customer.all_months || '-') + '</td>';
+    html += '<td>' + ((customer.all_months-customer.remaining_months) || '0') + '</td>';
+    html += '<td>' + (customer.remaining_months || '-') + '</td>';
 
-    html += '<td>' + (customer.SubscriptionInitAmount.toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '-') + '</td>';
-    html += '<td>' + (customer.SubscriptionInitDays || '-') + '</td>';
-
-    html += '<td>' + (customer.SubscriptionConsumedAmount.toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '-') + '</td>';
-    html += '<td>' + (customer.SubscriptionConsumedDays || '-') + '</td>';
-
-    html += '<td>' + (customer.SubscriptionRemainingAmount.toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '-') + '</td>';
-    html += '<td>' + (customer.SubscriptionRemainingDays || '-') + '</td>';
-
-    html += '<td>' + (customer.SubscriptionRecordedDate.substring(0, 10) || '-') + '</td>';
+    html += '<td>' + (customer.updated_date.substring(0, 10) || '-') + '</td>';
     html += '<td>' + (customer.CustomerRecordedDate.substring(0, 10) || '-') + '</td>';
 
 

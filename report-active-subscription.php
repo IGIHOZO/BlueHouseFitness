@@ -62,18 +62,15 @@ require("main/view.php");
 
 <!-- Table with stripped rows -->
 <table id="customerTable" class="table table-striped table-dark" style="font-size:12px">
-    <thead>
+<thead>
         <tr>
             <th>#</th>
             <!-- <th>Time</th> -->
             <th>Names</th>
             <th>Phone</th>
-            <th>Initial Amount</th>
-            <th>Initial Days</th>
-            <th>Consumed Amount</th>
-            <th>Consumed Days</th>
-            <th>Remaining Amount</th>
-            <th>Remaining Days</th>
+            <th>Initial Months</th>
+            <th>Consumed Months</th>
+            <th>Remaining Months</th>
             <th>Last Subscription</th>
             <th>Customer Registered Date</th>
 
@@ -118,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // Iterate through the data and construct HTML for each row
                     var html = '';
-var cnt = 1;
+                    var cnt = 1;
 data.data.forEach(customer => {
     var ttype = customer.EntranceType == 1 ? "Pay as You Enter" : "Subscription";
 
@@ -126,17 +123,11 @@ data.data.forEach(customer => {
     html += '<td>' + cnt + '</td>';
     html += '<td>' + (customer.CustomerFname || '-') + ' ' + (customer.CustomerLname || '-') + '</td>';
     html += '<td>' + (customer.CustomerPhone || '-') + '</td>';
+    html += '<td>' + (customer.all_months || '-') + '</td>';
+    html += '<td>' + ((customer.all_months-customer.remaining_months) || '0') + '</td>';
+    html += '<td>' + (customer.remaining_months || '-') + '</td>';
 
-    html += '<td>' + (customer.SubscriptionInitAmount.toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '-') + '</td>';
-    html += '<td>' + (customer.SubscriptionInitDays || '-') + '</td>';
-
-    html += '<td>' + (customer.SubscriptionConsumedAmount.toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '-') + '</td>';
-    html += '<td>' + (customer.SubscriptionConsumedDays || '-') + '</td>';
-
-    html += '<td>' + (customer.SubscriptionRemainingAmount.toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '-') + '</td>';
-    html += '<td>' + (customer.SubscriptionRemainingDays || '-') + '</td>';
-
-    html += '<td>' + (customer.SubscriptionRecordedDate.substring(0, 10) || '-') + '</td>';
+    html += '<td>' + (customer.updated_date.substring(0, 10) || '-') + '</td>';
     html += '<td>' + (customer.CustomerRecordedDate.substring(0, 10) || '-') + '</td>';
 
 

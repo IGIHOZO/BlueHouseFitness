@@ -98,20 +98,20 @@ require("main/view.php");
         <div class="col-lg-7">
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">Customer Data</h5>
+            <h5 class="card-title">expense Data</h5>
 
             <table id="expenseTable" class="table" style="font-size: 11px;">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Recorded Date</th>
-                <th>Title</th>
-                <th>Details</th>
-                <th>Value</th>
-            </tr>
-        </thead>
-        <tbody id="expenseTableBody"></tbody>
-    </table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Recorded Date</th>
+                        <th>Title</th>
+                        <th>Details</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody id="expenseTableBody"></tbody>
+            </table>
 
         </div>
     </div>
@@ -125,25 +125,23 @@ require("main/view.php");
 
   <script>
 
-function saveCustomer() {
-    var firstName = document.getElementById('expTitle').value;
-    var lastName = document.getElementById('expDetail').value;
-    var phoneNumber = document.getElementById('inputPhoneNumber').value;
-    var messageContainer = document.getElementById('messageContainer');
-    var customerForm = document.getElementById('customerForm');
+function saveExpense() {
+    var expTitle = document.getElementById('expTitle').value;
+    var expDetails = document.getElementById('expDetail').value;
+    var expValue = document.getElementById('expAmount').value;
 
     // Check if all fields are filled
-    if (!firstName || !lastName || !phoneNumber) {
+    if (!expTitle || !expDetails || !expValue) {
         messageContainer.innerHTML = '<div class="alert alert-danger">Please fill in all fields before saving.</div>';
         return;
     }
 
     // Prepare data object
     var data = {
-        "registerCustomer": true,
-        "CustomerFname": firstName,
-        "CustomerLname": lastName,
-        "phone": phoneNumber
+        "recordExpense": true,
+        "expTitle": expTitle,
+        "expDetails": expDetails,
+        "expValue": expValue
     };
 
     // Send POST request to "bluehouse/main/action.php"

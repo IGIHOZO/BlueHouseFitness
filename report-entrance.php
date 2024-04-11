@@ -46,7 +46,7 @@ require("main/view.php");
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
-          <li class="breadcrumb-item active">Customer Report</li>
+          <li class="breadcrumb-item active">Entrance Report</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->

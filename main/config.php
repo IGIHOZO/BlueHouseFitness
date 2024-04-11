@@ -1,30 +1,37 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 session_start();
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
+
+
 date_default_timezone_set('Africa/Kigali');
 if(!isset($_SESSION['user'])){
-    // header("Location: index.php");
+    header("Location: index.php");
 }
 //====================================================================================================== CONNECTION
-    $dbname = 'bluehouse';
-    $user = 'root';
-    $pass = '';
+    // $dbname = 'bluehouse';
+    // $user = 'root';
+    // $pass = '';
     
-    // $pass = 'password';
+    $dbname = 'bluehous_bluehouse';
+    $user = 'bluehous_seveeen';
+    $pass = 'Kigali123@';
 
 
     $con = new PDO("mysql:host=localhost;dbname=$dbname", $user, $pass);
 
 class DbConnect
 {
+    // private $host='localhost';
+    // private $dbName = 'bluehouse';
+    // private $user = 'root';
+    // private $pass = '';
+
     private $host='localhost';
-    private $dbName = 'bluehouse';
-    private $user = 'root';
-    private $pass = '';
-    // private $pass = 'password';
+    private $dbName = 'bluehous_bluehouse';
+    private $user = 'bluehous_seveeen';
+    private $pass = 'Kigali123@';
 
     public $conn;
     
