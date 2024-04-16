@@ -75,6 +75,11 @@
               <i style="font-size:medium" class="bi bi-cash-stack"></i><span>Entrance Fees</span>
             </a>
           </li>
+          <li>
+            <a href="sms.php">
+              <i style="font-size:medium" class="bi bi-cash-stack"></i><span>SMS</span>
+            </a>
+          </li>
         </ul>
       </li>
 

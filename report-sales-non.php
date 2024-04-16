@@ -56,39 +56,54 @@ require("main/view.php");
       <div class="row">
         <div class="col-lg-12">
 
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Non-subscribed Salles</h5>
-
-<!-- Table with stripped rows -->
-<table id="customerTable" class="table table-striped table-dark" style="font-size:12px">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Names</th>
-                <th>Phone</th>
-                <th>Amount</th>
-                <th>Payment Category</th>
-                <th>Time</th>
-            </tr>
-        </thead>
-        <tbody id="customerTableBody">
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="3"></td>
-                <td id="totalAmount"></td>
-                <td colspan="2"></td>
-            </tr>
-        </tfoot>
-    </table>
-
-
-<!-- End Table with stripped rows -->
-
-
+        <div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Non-subscribed Sales</h5>
+        <!-- Date Range Pickers -->
+        <div class="row mb-3">
+            <div class="col">
+                <label for="fromDate" class="form-label">From:</label>
+                <input type="date" class="form-control" id="fromDate" placeholder="Select From Date" value="<?php echo date('Y-m-d'); ?>">
             </div>
+            <div class="col">
+                <label for="toDate" class="form-label">To:</label>
+                <input type="date" class="form-control" id="toDate" placeholder="Select To Date" value="<?php echo date('Y-m-d'); ?>">
+            </div>
+            <div class="col">
+              <label for="filterButton" class="form-label">&nbsp;&nbsp;&nbsp;<br><br><br></label>
+              <button type="button" class="btn btn-primary" id="searchBtnNon" onclick="return searchNon();">
+                  <i class="bi bi-funnel"></i> Filter
+              </button>
           </div>
+        </div>
+        <!-- End Date Range Pickers -->
+
+        <!-- Table with stripped rows -->
+        <table id="customerTable" class="table table-striped table-dark" style="font-size:12px">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Names</th>
+                    <th>Phone</th>
+                    <th>Amount</th>
+                    <th>Payment Category</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody id="customerTableBody">
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3"></td>
+                    <td id="totalAmount"></td>
+                    <td colspan="2"></td>
+                </tr>
+            </tfoot>
+        </table>
+        <!-- End Table with stripped rows -->
+    </div>
+</div>
+
 
         </div>
       </div>
@@ -183,6 +198,87 @@ require("main/view.php");
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.18.0/dist/js/bootstrap-icons.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script> 
+<script>
+  // document.addEventListener('DOMContentLoaded', function () {
+    function searchNon() {
 
+        var fromDate = document.getElementById('fromDate').value;
+        var toDate = document.getElementById('toDate').value;
+
+        fetch('main/view.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `all_nonSub_salles_report_range=1&from=${encodeURIComponent(fromDate)}&to=${encodeURIComponent(toDate)}`,
+        })
+        .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var tableBody = document.getElementById('customerTableBody');
+                    var totalAmountElement = document.getElementById('totalAmount');
+
+                    // Clear existing rows and total amount
+                    tableBody.innerHTML = '';
+                    totalAmountElement.textContent = '';
+
+                    // Iterate through the data and construct HTML for each row and calculate total amount
+                    var html = '';
+                    var totalAmount = 0;
+                    var cnt = 1;
+
+                    data.data.forEach(customer => {
+                        var ttype = customer.EntranceType == 1 ? "unsubscribed" : "Subscribed";
+                        var entranceAmount = parseFloat(customer.EntranceAmount) || 0;
+
+                        totalAmount += entranceAmount;
+
+                        html += '<tr>';
+                        html += '<td>' + cnt + '</td>';
+                        html += '<td>' + (customer.CustomerFname || '-') + ' ' + (customer.CustomerLname || '-') + '</td>';
+                        html += '<td>' + (customer.CustomerPhone || '-') + '</td>';
+                        html += '<td>' + entranceAmount.toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</td>';
+                        html += '<td>' + ttype + '</td>';
+                        html += '<td>' + (customer.EntranceTime || '-') + '</td>';
+                        html += '</tr>';
+                        cnt++;
+                    });
+
+                    tableBody.innerHTML = html;
+
+                    $('#customerTable').DataTable({
+                        "footerCallback": function (row, data, start, end, display) {
+                            var api = this.api(), data;
+
+                            var intVal = function (i) {
+                                return typeof i === 'string' ?
+                                    i.replace(/[\$,]/g, '') * 1 :
+                                    typeof i === 'number' ?
+                                    i : 0;
+                            };
+
+                            total = api
+                                .column(3)
+                                .data()
+                                .reduce(function (a, b) {
+                                    return intVal(a) + intVal(b);
+                                }, 0);
+
+                            totalAmountElement.textContent = 'Total Amount: ' + total.toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+    }
+
+    document.getElementById('searchBtnNon').addEventListener('click', searchNon);
+// });
+</script>
 <!-- ... -->
 

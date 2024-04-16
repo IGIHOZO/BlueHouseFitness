@@ -90,7 +90,24 @@ $unit = $MainView->loadUnitValue();
         </div>
     </div>
     <div class="row mb-3">
-        <label for="inputInitAmount" class="col-sm-5 col-form-label">Amount to Record/Add:</label>
+        <label for="isDiscount" class="col-sm-5 col-form-label">Is Discount ?:</label>
+        <div class="col-sm-7">
+            <div class="form-check form-switch form-check-lg">
+                <input class="form-check-input" type="checkbox" style="width:120px;height:40px" id="isDiscount" onchange="toggleDiscount()" data-toggle="toggle" data-on="1" data-off="0">
+                <label class="form-check-label" for="isDiscount" style="width:120px;height:40px"></label>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row mb-3">
+        <label for="inputInitAmount" class="col-sm-5 col-form-label">Discount Value:</label>
+        <div class="col-sm-7">
+            <input type="text" class="form-control" id="DiscountValue" value="0" disabled>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="inputInitAmount" class="col-sm-5 col-form-label">Amount-Paid:</label>
         <div class="col-sm-7">
             <input type="text" class="form-control" id="inputInitAmount">
         </div>
@@ -177,47 +194,58 @@ $unit = $MainView->loadUnitValue();
     });
 
     function saveSubscription() {
-        const client = $('#inputSelect').val();
-        const amount = $('#inputInitAmount').val();
+    const client = $('#inputSelect').val();
+    const amount = $('#inputInitAmount').val();
+    const isDiscount = $('#isDiscount').prop('checked'); // Use prop() to get the checked status
+    const DiscountValue = $('#DiscountValue').val();
+    console.log(isDiscount);
 
-        // Check if the client and amount are selected/entered
-        if (!client || !amount) {
-            $('#subscriptionMessageContainer').html('<div class="alert alert-danger" role="alert">Please select a customer and enter the amount.</div>');
-            return;
-        }
-
-        // Prepare data for submission
-        const data = {
-            save_subscription: 1,
-            client: client,
-            amount: amount
-        };
-
-        // Make a POST request to main/action.php
-        fetch('main/action.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        })
-        .then(response => response.json())
-        .then(response => {
-            if (response.success) {
-                $('#subscriptionMessageContainer').html('<div class="alert alert-success" role="alert">' + response.message + '</div>');
-                // Reload the page after displaying the response
-                setTimeout(() => {
-                    location.reload();
-                }, 2000); // Delay for 2 seconds (adjust as needed)
-            } else {
-                $('#subscriptionMessageContainer').html('<div class="alert alert-danger" role="alert">' + response.message + '</div>');
-            }
-        })
-        .catch(error => {
-            console.error('Error submitting data:', error);
-            $('#subscriptionMessageContainer').html('<div class="alert alert-danger" role="alert">An error occurred while submitting the form.</div>');
-        });
+    if (!client || !amount) {
+        $('#subscriptionMessageContainer').html('<div class="alert alert-danger" role="alert">Please select a customer and enter the amount.</div>');
+        return;
+    } else if (isDiscount && (!DiscountValue || DiscountValue == 0)) {
+        $('#subscriptionMessageContainer').html('<div class="alert alert-danger" role="alert">Invalid Discount Value.</div>');
+        return;
+    } else if (isDiscount && amount % DiscountValue !== 0) {
+        $('#subscriptionMessageContainer').html('<div class="alert alert-danger" role="alert">Discount Value must be a divisor of the Amount paid.</div>');
+        return;
     }
+
+    const data = {
+        save_subscription: 1,
+        client: client,
+        amount: amount
+    };
+
+    if (isDiscount) {
+        data.isDiscount = true;
+        data.discount_value = DiscountValue;
+    }
+
+    fetch('main/action.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(response => {
+        if (response.success) {
+            $('#subscriptionMessageContainer').html('<div class="alert alert-success" role="alert">' + response.message + '</div>');
+            setTimeout(() => {
+                location.reload();
+            }, 2000); 
+        } else {
+            $('#subscriptionMessageContainer').html('<div class="alert alert-danger" role="alert">' + response.message + '</div>');
+        }
+    })
+    .catch(error => {
+        console.error('Error submitting data:', error);
+        $('#subscriptionMessageContainer').html('<div class="alert alert-danger" role="alert">An error occurred while submitting the form.</div>');
+    });
+}
+
 
 
 
@@ -270,4 +298,17 @@ $unit = $MainView->loadUnitValue();
                 console.error('There was a problem with the fetch operation:', error);
             });
     }); 
+
+//=============== disable / enable
+
+    function toggleDiscount() {
+        var discountCheckbox = document.getElementById("isDiscount");
+        var discountValueInput = document.getElementById("DiscountValue");
+        
+        if (discountCheckbox.checked) {
+            discountValueInput.disabled = false;
+        } else {
+            discountValueInput.disabled = true;
+        }
+    }
 </script>

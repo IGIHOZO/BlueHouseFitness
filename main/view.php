@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('Africa/Kigali');
 require("config.php");
 class MainView extends DBConnect
 {
@@ -252,6 +253,39 @@ class MainView extends DBConnect
      $con = null;
      return json_encode($response);
  }
+ public function all_nonSub_salles_report_range($from, $to)
+ {
+     $con = parent::connect();
+ 
+     try {
+         // Construct the query with a WHERE clause to filter by date range
+         $query = "SELECT * FROM entrances 
+                   INNER JOIN customers ON entrances.EntranceClient = customers.CustomerID 
+                   WHERE entrances.EntranceType = 1 
+                   AND entrances.EntranceStatus = 1 
+                   AND entrances.EntranceTime BETWEEN :from AND :to";
+ 
+         $sel = $con->prepare($query);
+         $sel->bindParam(':from', $from);
+         $sel->bindParam(':to', $to);
+         $sel->execute();
+ 
+         $entrance = $sel->fetchAll(PDO::FETCH_ASSOC);
+ 
+         if ($entrance) {
+             $response = array('success' => true, 'data' => $entrance);
+         } else {
+             $response = array('success' => false, 'message' => 'No Entrance history found');
+         }
+     } catch (PDOException $e) {
+         $response = array('error' => true, 'message' => 'Database error: ' . $e->getMessage());
+     }
+ 
+     $con = null;
+     return json_encode($response);
+ }
+ 
+ 
 
  public function displayExpenses()
 {
@@ -379,6 +413,84 @@ public function allPaymentsSalesReport()
     $con = null;
     return json_encode($response);
 }
+
+public function allPaymentsSalesReportRange($fromDate, $toDate)
+{
+    $con = parent::connect();
+
+    try {
+        $subscriptionQuery = "SELECT 'subscription' AS transaction_type, 
+                                      subscriptions_transactions.transaction_id, 
+                                      subscriptions_transactions.client_id, 
+                                      subscriptions_transactions.amount_paid AS amount_paid,
+                                      subscriptions_transactions.recorded_date AS date_saved, 
+                                      subscriptions_transactions.subscriptions_months, 
+                                      subscriptions_transactions.subscriptions_start, 
+                                      subscriptions_transactions.subscriptions_end, 
+                                      subscriptions_transactions.status AS subscription_status, 
+                                      subscriptions_transactions.recorded_date AS subscription_recorded_date,
+                                      customers.* 
+                              FROM subscriptions_transactions
+                              JOIN customers ON subscriptions_transactions.client_id = customers.CustomerID
+                              WHERE subscriptions_transactions.recorded_date BETWEEN :fromDate AND :toDate
+                              ORDER BY subscriptions_start DESC, recorded_date DESC, CustomerID DESC";
+
+        $entranceQuery = "SELECT 'entrance' AS transaction_type, 
+                                   entrances.EntranceID AS transaction_id, 
+                                   entrances.EntranceClient AS client_id, 
+                                   entrances.EntranceAmount AS amount_paid,
+                                   entrances.EntranceTime AS date_saved, 
+                                   NULL AS subscriptions_months, 
+                                   NULL AS subscriptions_start, 
+                                   NULL AS subscriptions_end, 
+                                   entrances.EntranceStatus AS entrance_status, 
+                                   entrances.EntranceTime AS entrance_recorded_date,
+                                   customers.* 
+                          FROM entrances
+                          JOIN customers ON entrances.EntranceClient = customers.CustomerID
+                          WHERE entrances.EntranceTime BETWEEN :fromDate AND :toDate
+                          ORDER BY EntranceTime DESC, CustomerID DESC";
+
+        $data = [];
+
+        $subscriptionStmt = $con->prepare($subscriptionQuery);
+        $entranceStmt = $con->prepare($entranceQuery);
+
+        $subscriptionStmt->bindParam(':fromDate', $fromDate);
+        $subscriptionStmt->bindParam(':toDate', $toDate);
+        $entranceStmt->bindParam(':fromDate', $fromDate);
+        $entranceStmt->bindParam(':toDate', $toDate);
+
+        $subscriptionStmt->execute();
+        $entranceStmt->execute();
+
+        $subscriptionRow = $subscriptionStmt->fetch(PDO::FETCH_ASSOC);
+        $entranceRow = $entranceStmt->fetch(PDO::FETCH_ASSOC);
+
+        while ($subscriptionRow || $entranceRow) {
+            if ($subscriptionRow && (!$entranceRow || $subscriptionRow['subscriptions_start'] >= $entranceRow['entrance_recorded_date'])) {
+                $data[] = $subscriptionRow;
+                $subscriptionRow = $subscriptionStmt->fetch(PDO::FETCH_ASSOC);
+            } elseif ($entranceRow) {
+                $data[] = $entranceRow;
+                $entranceRow = $entranceStmt->fetch(PDO::FETCH_ASSOC);
+            }
+        }
+
+        if ($data) {
+            $response = array('success' => true, 'data' => $data);
+        } else {
+            $response = array('success' => false, 'message' => 'No Sales history found');
+        }
+
+    } catch (PDOException $e) {
+        $response = array('error' => true, 'message' => 'Database error: ' . $e->getMessage());
+    }
+
+    $con = null;
+    return json_encode($response);
+}
+
 
 
 private function calculateRemainingDays($startingDate, $endingDate, $allMonths)
@@ -614,6 +726,9 @@ if (isset($_GET['all_customers'])) {
 }elseif (isset($_GET['all_nonSub_salles_report'])) {
     $result = $MainView->all_nonSub_salles_report();
     echo $result;
+}elseif (isset($_POST['all_nonSub_salles_report_range'])) {
+    $result = $MainView->all_nonSub_salles_report_range($_POST['from'], $_POST['to']);
+    echo $result;
 }elseif (isset($_GET['displayExpenses'])) {
     $result = $MainView->displayExpenses();
     echo $result;
@@ -622,6 +737,9 @@ if (isset($_GET['all_customers'])) {
     echo $result;
 }elseif (isset($_GET['allPaymentsSalesReport'])) {
     $result = $MainView->allPaymentsSalesReport();
+    echo $result;
+}elseif (isset($_GET['allPaymentsSalesReportRange'])) {
+    $result = $MainView->allPaymentsSalesReportRange($_GET['fromDate'], $_GET['toDate']);
     echo $result;
 }elseif (isset($_GET['checkRemainingDays'])) {
     $result = $MainView->checkRemainingDays();

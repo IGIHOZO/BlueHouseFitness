@@ -71,7 +71,7 @@ require("main/view.php");
             <th>Initial Months</th>
             <th>Consumed Months</th>
             <th>Remaining Months</th>
-            <th>Last Subscription</th>
+            <th>Updated</th>
             <th>Customer Registered Date</th>
 
             <!-- Add more header columns as needed based on your data -->

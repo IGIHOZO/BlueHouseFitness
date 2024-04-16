@@ -59,7 +59,23 @@ require("main/view.php");
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">All Salles</h5>
-
+        <!-- Date Range Pickers -->
+        <div class="row mb-3">
+            <div class="col">
+                <label for="fromDate" class="form-label">From:</label>
+                <input type="date" class="form-control" id="fromDate" placeholder="Select From Date" value="<?php echo date('Y-m-d'); ?>">
+            </div>
+            <div class="col">
+                <label for="toDate" class="form-label">To:</label>
+                <input type="date" class="form-control" id="toDate" placeholder="Select To Date" value="<?php echo date('Y-m-d'); ?>">
+            </div>
+            <div class="col">
+              <label for="filterButton" class="form-label">&nbsp;&nbsp;&nbsp;<br><br><br></label>
+              <button type="button" class="btn btn-primary" id="searchBtnNon" onclick="return searchNon();">
+                  <i class="bi bi-funnel"></i> Filter
+              </button>
+          </div>
+        </div>
 <!-- Table with stripped rows -->
 <table id="customerTable" class="table table-striped table-dark" style="font-size:12px">
         <thead>
@@ -186,5 +202,52 @@ require("main/view.php");
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script> 
 
+<script>
+function searchNon() {
+    var fromDate = encodeURIComponent(document.getElementById('fromDate').value);
+    var toDate = encodeURIComponent(document.getElementById('toDate').value);
+
+    fetch('main/view.php?allPaymentsSalesReportRange=1&fromDate=' + fromDate + '&toDate=' + toDate)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            var tableBody = document.getElementById('customerTableBody');
+            var totalAmountElement = document.getElementById('totalAmount');
+            tableBody.innerHTML = '';
+            totalAmountElement.textContent = '';
+            var html = '';
+            var totalAmount = 0;
+            var cnt = 1;
+
+            data.data.forEach(customer => {
+                var ttype = customer.EntranceType == 1 ? "unsubscribed" : "Subscribed";
+                var entranceAmount = parseFloat(customer.EntranceAmount) || 0;
+                totalAmount += entranceAmount;
+                html += '<tr>';
+                html += '<td>' + cnt + '</td>';
+                html += '<td>' + (customer.CustomerFname || '-') + ' ' + (customer.CustomerLname || '-') + '</td>';
+                html += '<td>' + (customer.CustomerPhone || '-') + '</td>';
+                html += '<td>' + customer.amount_paid.toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</td>';
+                html += '<td>' + customer.transaction_type + '</td>';
+                html += '<td>' + (customer.date_saved || '-') + '</td>';
+                html += '</tr>';
+                cnt++;
+            });
+
+            tableBody.innerHTML = html;
+            totalAmountElement.textContent = 'Total Amount: ' + totalAmount.toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+}
+
+// document.getElementById('searchBtnNon').addEventListener('click', searchNon);
+
+</script>
 <!-- ... -->
 

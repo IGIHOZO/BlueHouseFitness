@@ -77,8 +77,8 @@ require("main/view.php");
             <span class="input-group-text" id="toDateAddon"><i class="bi bi-calendar"></i></span>
         </div>
     </div>
-    <div class="col-md-2">
-        <button class="btn btn-primary" id="searchBtn" onclick="return search();">Search</button>
+    <div class="col-md-2"><br>
+        <button class="btn btn-primary" id="searchBtn" onclick="return search();"><i class="bi bi-funnel"></i> Filter</button>
     </div>
 </div>
 <div id="loadingIndicator" style="display: none;">Loading...</div>
