@@ -9,29 +9,29 @@ if(!isset($_SESSION['user'])){
     header("Location: index.php");
 }
 //====================================================================================================== CONNECTION
-    // $dbname = 'bluehouse';
-    // $user = 'root';
-    // $pass = '';
+    $dbname = 'bluehouse';
+    $user = 'root';
+    $pass = '';
     
 
-    $dbname = 'bluehous_bluehouse';
-    $user = 'bluehous_seveeen';
-    $pass = 'Kigali123@';
+    // $dbname = 'bluehous_bluehouse';
+    // $user = 'bluehous_seveeen';
+    // $pass = 'Kigali123@';
 
 
     $con = new PDO("mysql:host=localhost;dbname=$dbname", $user, $pass);
 
 class DbConnect
 {
-    // private $host='localhost';
-    // private $dbName = 'bluehouse';
-    // private $user = 'root';
-    // private $pass = '';
-
     private $host='localhost';
-    private $dbName = 'bluehous_bluehouse';
-    private $user = 'bluehous_seveeen';
-    private $pass = 'Kigali123@';
+    private $dbName = 'bluehouse';
+    private $user = 'root';
+    private $pass = '';
+
+    // private $host='localhost';
+    // private $dbName = 'bluehous_bluehouse';
+    // private $user = 'bluehous_seveeen';
+    // private $pass = 'Kigali123@';
 
 
     public $conn;
